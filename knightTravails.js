@@ -13,35 +13,12 @@ export const knightGraph = () => {
           }
         }
       },
-      /* //add all legal Knight moves as edges to the vertices
-      genLegalMoves (x = 0, y = 0, board = this.chessBoard) {
-        //let board = this.chessBoard
-        const moveOffsets = [
-          [-2, -1],
-          [-2, 1],
-          [-1, -2],
-          [-1, 2],
-          [1, -2],
-          [1, 2],
-          [2, -1],
-          [2, 1]
-        ]
-        for (let i of moveOffsets) {
-          let newX = x + parseInt(i[0])
-          let newY = y + parseInt(i[1])
-          let edge = [newX,newY]
-          if (board.has(JSON.stringify(edge))) {
-            let key = JSON.stringify([x, y])
-            board.get(key).push(JSON.stringify(edge))
-          }
-        }
-        return board
-      } */
     addEdges(board = this.chessBoard){
       for (let [ coord ] of board) {
         const coordArr = JSON.parse(coord)
         const x = parseInt(coordArr[0])
         const y = parseInt(coordArr[1])
+        //an array of all the possible moves the Knight could make from a given chess square
         const moveOffsets = [
           [-2, -1],
           [-2, 1],
@@ -57,6 +34,7 @@ export const knightGraph = () => {
           let newY = y + parseInt(i[1])
           let edge = [newX,newY]
           let stringEdge = JSON.stringify((edge))
+          //check that the edge to the next node is within the board bound AND if the current coordinate doesnt currently map to the new edge, then push the edge onto the array that maps to that coord
           if (board.has(stringEdge) && !board.get(coord).includes(stringEdge)) {
             this.chessBoard.get(coord).push(stringEdge);
           }
@@ -70,32 +48,33 @@ export const knightGraph = () => {
       const previous = new Map()
       const queue = []
       const  visited = new Set()
+      //create a queue to hold objects of the strings of the nodes and their distance or level of travel from the start node
       queue.push({node: JSON.stringify(startNode), dist: 0})
+      //add to a Set of nodes to track which nodes we've visited
       visited.add(JSON.stringify(startNode))
-/*         console.log('queue: ')
-        console.log(queue) */
+      //while loop to go through queue
       while(queue.length>0){
+        //dequeue node
         const {node, dist} = queue.shift()
-/*         console.log('first element dequeued: ')
-        console.log({node, dist})
-        console.log('new queue: ')
-        console.log(queue) */
+        //check our base case to see if we found our path
         if (node === JSON.stringify(stopNode)) {
           console.log(`Shortest Number of paths: ${dist}`)
-          console.log('See Nodes traversed, below')
+          console.log('See array of Nodes traversed below:')
           this.printPath(previous, startNode, stopNode)
+          //returns the distance and Map of previously visited nodes so we could do something with them beside call printPath if we want
           return  {shortestDistance: dist, previous}
         }
+        //if our basecase is not reach go through all neighbors of our current node
         for (let neighbor of this.chessBoard.get((node))) {
-          //neighbor = JSON.parse(neighbor)
+          //if the neighbor is not already in the visited Set then add the neighbor and the current node to the previous Map, push it onto the queue to traverse with an iterated dist, and finially add to the visited Set
           if (!visited.has(neighbor)) {
             previous.set(neighbor, node)
             queue.push({ node: neighbor, dist: dist + 1 })
             visited.add(neighbor)
-            
           }
         }
       }
+      //return -1 distance if shortestpath can't be found
       return {shortestDistance: -1, previous}
       },
       printPath (previous, startNode, stopNode) {
@@ -115,21 +94,12 @@ export const knightGraph = () => {
   const graph = knightGraph()
   graph.genBoard()
   graph.addEdges()
+  let {shortestDistance, previous} = graph.knightMoves([7,7],[1,0])
   //console.log(typeof graph.chessBoard.get(JSON.stringify([2,3])))
   //console.log(graph.genLegalMoves(2,3))
   //console.log(graph.genLegalMoves(0,2))
-  
-  //console.log(graph.chessBoard)
-  let {shortestDistance, previous} = graph.knightMoves([4,3],[4,4])
+  //console.log(graph.chessBoard
   //console.log(`shortestdist: ${shortestDistance}`)
   //console.log(graph.knightMoves([2,3],[3,0]).previous)
-  //graph.printPath(graph.knightMoves([2,3],[3,0]).previous,[2,3],[3,0])
 
- /*  let x = 1
-  let y = 1
-  console.log(JSON.parse(`[${x},${y}]`)) */
-  /* let pracQueue = new Map()
-  pracQueue.set('node', [2,3])
-  console.log(pracQueue)
-  console.log(pracQueue.has([2,3])) */
   
